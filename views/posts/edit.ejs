@@ -1,0 +1,13 @@
+<html>
+<head>
+	<title>edit</title>
+</head>
+<body>
+	<h1> this is: edit post</h1>
+	<form action="/posts/<%=posts.id%>?_method=patch" method="post">
+		<input type="text" name="title" value="<%=post.title%>" >
+		<input type="text" name="body" >
+		<input type="submit">
+	</form>
+</body>
+</html>

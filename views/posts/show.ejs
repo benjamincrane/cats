@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title>Post: "<%=post.title %>"</title>
+</head>
+<body>
+<h1> this is: show post </h1>
+<h3> <%=post.title%> </h3>
+<p><%=post.body%></p>
+<p><%=post.id%></p>
+<p><%=post.user_id%></p>
+<a href="/posts/<%=post.id %>/edit"> Edit </a>
+<form action="/posts/<%=post.id%>?_method=delete" action="post" > 
+</form>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+<head>
+	<title> test page </title>
+</head>
+<body>
+	<h1> this is: index </h1>
+<a href="/users/new">click me for new users</a>
+</br>
+<a href="/sessions/new">click me to log in </a>
+</br>
+
+<!-- <a href="">click me to logout</a> -->
+<%if (user) { %>
+<a href="/posts/index">click me to see posts </a>
+<form action="/sessions?_method=delete" method="post">
+	<input type="submit" value="log out">
+</form>
+<%} %>
+</body>
+</html>

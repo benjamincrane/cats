@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title>blah</title>
+</head>
+<body>
+<h1> this is: posts </h1>
+<a href="/posts/new"> Create New Post</a>
+<ul>
+	<%=console.log(posts)%>
+	<%=console.log(posts[0])%>
+	<%=console.log(posts[0].id)%>
+	<% for (var i = 1; i< posts.length+1; i++) {%>
+		<li> 
+			<a href="/posts/<%=i%>"> <%= posts.title %> </a> 
+		</li>
+	<% } %>
+</ul>
+</body>
+</html>
