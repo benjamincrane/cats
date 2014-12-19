@@ -1,18 +1,18 @@
 <html>
 <head>
-	<title> test page </title>
+	<title> the internet is made of cats </title>
 </head>
 <body>
-	<h1> this is: index </h1>
+	<h1> the Cat Fancier </h1>
+	<h4> for this was the internet invented </h4> 
 <a href="/users/new">click me for new users</a>
 </br>
 <a href="/sessions/new">click me to log in </a>
 </br>
 
-<!-- <a href="">click me to logout</a> -->
 <%if (user) { %>
-<a href="/posts/index">click me to see posts </a>
-<form action="/sessions?_method=delete" method="post">
+<a href="/cats/index">click me to see cats </a>
+<form action="/logout" method="get">
 	<input type="submit" value="log out">
 </form>
 <%} %>

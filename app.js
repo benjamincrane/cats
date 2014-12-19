@@ -8,8 +8,15 @@ var express       = require('express'),
 	passport      = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	db            = require('./db.js'),
+    http          = require('http'),
    methodOverride = require('method-override')
 	;
+var	parseString   = require('xml2js').parseString ;
+var	http          = require('http') ;
+	options = { 
+	host: 'thecatapi.com', 
+	path: '/api/images/get?format=xml&size=small&typ=png,jpg&results_per_page=1'
+} 
 
 app.set('view engine','ejs');
 
@@ -21,7 +28,6 @@ app.use(session({
 	resave: false,
 	saveUnitialized: true
 }))
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -85,100 +91,112 @@ app.post('/sessions', passport.authenticate('local',
 		[req.body.email,req.body.password],
 		function(err, dbResult) {
 			if(!err) {
-			res.redirect('/');
+			res.redirect('/cats/index');
 			}
 		}
 	)
 	}
 );
 
-app.delete('/sessions', function(req,res) {
-	res.logout();
+app.get('/logout', function(req,res) {
+	req.logout();
 	res.redirect('/');
 })
 
 //cat routes
 app.get('/cats/index', function(req,res) {
-	// db.query("select * from posts where user_id=$1",
-	// 	[req.user.id],
-	// 	 function(err,dbResult) {
-	// 	 	if(!err) {
-		res.render('cats/index'
-			// , {posts:dbResult.rows}
-			)
-			// } else {
-			// 	res.send("select * from posts user_id failed")
-			// }
+		res.render('cats/index')
 	})
-// })
-
-app.get('/cats/chooser', function(req,res) {
-	//need to be able to accept ID field for 'edit' functionality
-	res.render('cats/chooser');
-})
 
 app.get('/cats/liked', function(req,res) {
-	res.render('cats/liked');
+	var user = [];
+	user.push(req.user.id);
+	db.query("select * from cat_pictures where user_id =$1 and user_like=true",
+		user,
+		function(err, dbResult) {
+			if(!err) {
+				res.render('cats/liked',{prettyCats:dbResult.rows})
+			} else {
+				console.log(err)
+				res.send("pretty kitties not found")
+			}
+		})
 })
 
 app.get('/cats/disliked', function(req,res) {
-	res.render('cats/disliked');
-})
-
-app.post('/posts', function(req,res) {
-	db.query("insert into posts (title, body, user_id) values ($1,$2,$3)",
-		 [req.body.title,req.body.body,req.user.id],
-		 function(err, dbResult) {
+	var user = [];
+	user.push(req.user.id);
+	db.query("select * from cat_pictures where user_id =$1 and user_like=false",
+		user,
+		function(err, dbResult) {
 			if(!err) {
-				res.redirect('/posts/index',{posts:dbResult.rows});
+				res.render('cats/disliked',{badCats:dbResult.rows})
 			} else {
-				res.send("post post failed");
+				console.log(err)
+				res.send("unloved cats not found")
 			}
 		})
-}
-)
+})
+
+app.get('/cats/chooser', function(req, res) {
+	var catObject = http.get(options, function(resu) {
+  		var bodyChunks = [];
+  		resu.on('data', function(chunk) {
+			bodyChunks.push(chunk);
+  		}).on('end', function() {
+			var body = Buffer.concat(bodyChunks);
+			parseString(body, function (err, result) {
+				cat={}
+				cat.url = result.response.data[0].images[0].image[0].url;
+				cat.id = result.response.data[0].images[0].image[0].id;
+				cat.src = result.response.data[0].images[0].image[0].source_url;
+				var url1 = JSON.stringify(cat.url)
+				var id1 = JSON.stringify(cat.id)
+				var src1 = JSON.stringify(cat.src)
+				var url = url1.substring(2,url1.length-2);
+				var id = id1.substring(2,id1.length-2);
+				var src = src1.substring(2,src1.length-2);
+				params = [url,id,src,req.user.id]
+				db.query("insert into cat_pictures (url,cat_id,src,user_id) values ($1,$2,$3,$4)",
+		 		params,
+			 	function() {
+					res.render('cats/chooser',{cat:cat})
+				});
+			});
+		})
+	});
+});
+
+app.post('/cats/chooser', function(req,res) {
+	user = req.user.id;
+	catString = req.body.liked;
+	catID = catString.substring(0, catString.length-2)
+	catRating = catString.slice(-1);
+	if (catString.slice(-1)==="t")
+	{likeValue = true}
+	else
+	{likeValue = false}
+	params = [likeValue,catID];
+	db.query("update cat_pictures set user_like = $1 where cat_id=$2",
+		params,
+		function(err, dbResult) {
+			res.redirect('chooser')
+		})
+});
+
 
 app.get('/cats/:id', function(req,res) {
 	db.query("select * from posts where id = $1", [req.params.id],
 		function(err,dbResult) {
 			if(!err) {
-				res.render('posts/show',{post: dbResult.rows[0]});
+				res.render('cats/show',{post: dbResult.rows[0]});
 			} else {
-				res.send("posts get post_id failed");
+				res.send("cats get cat_id failed");
 			}
 		})
 })
 
-app.get('/cats/:id/edit', function(req,res) {
-	db.query("select * from posts where id = $1", [req.params.id],
-		function(err,dbResult) {
-			if(!err) {
-				res.render('posts/edit',{post: dbResult.rows[0]});
-			} else {
-				res.send("post edit failed");
-			}
-		})
-})
 
-app.patch('/posts/:id', function(req,res) {
-	db.query('update posts set title=$1, body=$2 where id = $3',
-		[req.body.title, req.body.body,req.params.id],
-		function(err, dbResult) {
-			if(!err) {
-				res.redirect('/posts/'+req.params.id);
-			}
-		})
-})
-
-app.delete('/posts/:id', function(req,res) {
-	db.query("delete from posts where id=$1", [req.params.id],
-		function(err,dbResult) {
-			if(!err) {
-				res.redirect('/posts')
-			}
-		})
-})
-
-app.listen(3000, function() {
-	console.log("I am ready");
+app.listen(process.env.PORT || 3000, function() {
+	console.log("Your sound card works perfectly.");
 });

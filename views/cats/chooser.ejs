@@ -1,14 +1,42 @@
 <html>
 <head>
-	<title>New Cat</title>
+	<title>Cat Fancier</title>
 </head>
 <body>
-<h1> this is: cat chooser </h1>
-<a href="index">Take me to the index</a>
-</br>
-<a href="liked">Actually I want the cats I like</a>
-</br>
-<a href="disliked">Actually I want the cats I don't like</a>
-
+<h1> judge this cat right meow </h1>
+<div class="header">
+	<a href="index">I want to go back to the main page</a>
+	</br>
+	<a href="liked">Actually show me cats I like</a>
+	</br>
+	<a href="disliked">Actually I want the cats I don't like</a>
+</div>
+<div class="cat_box">
+	<div class="cat_picture">  
+		<a href="http://thecatapi.com/?id=<%=cat.id%>"><img src="<%=cat.url%>"> </a>
+		<p>Cat picture source 
+			<a href="<%=cat.url%>"><%=cat.url%></a>	
+		</p>
+	</div>
+	<div class="cat_buttons">
+		<form action="chooser" method="post">
+			<ul>
+				<li>
+					<label for="like">
+						<input type="radio" name="liked" id="like" value="<%=cat.id%>_t">
+					I like this picture</label>
+				</li>
+				<li>
+					<label for="dislike">
+						<input type="radio" name="liked" id="like" value="<%=cat.id%>_f">
+					I dislike this picture</label>
+				</li>
+			</ul>
+			<input type="submit" value="Judge this cat">
+		</form>
+		</br>
+		<a href="chooser"> I'm not feeling this one. Give me a different cat.</a>
+	</div>
+</div>
 </body>
 </html>

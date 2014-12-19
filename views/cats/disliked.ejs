@@ -1,12 +1,23 @@
 <html>
 <head>
-	<title>edit</title>
+	<title> disliked cats</title>
 </head>
 <body>
-	<h1> this is: disliked cats</h1>
-<a href="index">Take me to the index</a>
-</br>
-<a href="liked">Actually I want the cats I like</a>
+	<h1> why am I looking at these again</h1>
+<div class="header">
+	<a href="index">Take me to the index</a>
+	</br>
+	<a href="liked">Actually I want the cats I like</a>
+</div>
+<% for (var i=0;i<badCats.length;i++) {%>
 
+<div class="cat_picture">  
+		<a href="http://thecatapi.com/?id=<%=badCats[i].cat_id%>"><img src="<%=badCats[i].url%>"> </a>
+		<p>Cat picture source 
+			<a href="<%=badCats[i].url%>"><%=badCats[i].url%></a>	
+		</p>
+	</div>
+	
+<%}%>
 </body>
 </html>
