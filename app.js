@@ -7,7 +7,7 @@ var express       = require('express'),
 	bodyParser    = require('body-parser'),
 	passport      = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
-	db            = require('./db.js'),
+	db            = require('./db_heroku.js'),
     http          = require('http'),
    methodOverride = require('method-override')
 	;
